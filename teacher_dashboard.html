@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Teacher Dashboard - LabTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+    :root{
+        --navy: #14213D;
+        --navy-2: #1C2E52;
+        --amber: #FCA311;
+        --amber-dim: #FCA31133;
+        --bg: #F5F6F8;
+        --text-dim: #8A93A8;
+        --white: #ffffff;
+        --green: #1DAA6D;
+        --red: #E5484D;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+    }
+    .topbar {
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        color: white;
+        padding: 18px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: 0.3px;
+    }
+    .brand-dot {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        background: var(--amber);
+        box-shadow: 0 0 0 4px var(--amber-dim);
+    }
+    .topbar .user-info {
+        font-size: 13px;
+        color: #C9D0E0;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .avatar {
+        width: 28px; height: 28px;
+        border-radius: 50%;
+        background: var(--amber);
+        color: var(--navy);
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .topbar .logout {
+        color: var(--amber);
+        text-decoration: none;
+        font-weight: 600;
+        border: 1px solid var(--amber);
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 12px;
+        transition: background 0.15s, color 0.15s;
+    }
+    .topbar .logout:hover {
+        background: var(--amber);
+        color: var(--navy);
+    }
+
+    .hero {
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        color: white;
+        padding: 0 32px 56px;
+        position: relative;
+        overflow: hidden;
+    }
+    .hero::before {
+        content: "";
+        position: absolute;
+        top: -80px; right: -80px;
+        width: 260px; height: 260px;
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 50%;
+    }
+    .hero-inner {
+        max-width: 1150px;
+        margin: 0 auto;
+        padding-top: 30px;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .hero-inner h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 28px;
+        margin: 0 0 6px;
+    }
+    .hero-inner p {
+        color: #AEB7CC;
+        font-size: 14px;
+        margin: 0;
+    }
+    .hero-date {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--amber);
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        padding: 8px 14px;
+        border-radius: 8px;
+    }
+
+    .container {
+        max-width: 1150px;
+        margin: -34px auto 0;
+        padding: 0 24px 40px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 24px rgba(20,33,61,0.10);
+        border-top: 3px solid var(--amber);
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+    .stat-card .label {
+        font-size: 11px;
+        color: var(--text-dim);
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+    }
+    .stat-card .value {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 26px;
+        color: var(--navy);
+        margin-top: 6px;
+    }
+    .stat-icon {
+        width: 34px; height: 34px;
+        border-radius: 9px;
+        background: var(--amber-dim);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+    @media (max-width: 860px) {
+        .main-grid { grid-template-columns: 1fr; }
+        .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .panel-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 24px rgba(20,33,61,0.08);
+        padding: 26px;
+        margin-bottom: 20px;
+    }
+    .panel-card h2 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 16px;
+        color: var(--navy);
+        margin: 0 0 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .panel-card .panel-sub {
+        color: var(--text-dim);
+        font-size: 13px;
+        margin: 0 0 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th {
+        text-align: left;
+        font-size: 11px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        padding: 10px 8px;
+        border-bottom: 1.5px solid #E3E6ED;
+    }
+    td {
+        padding: 13px 8px;
+        font-size: 14px;
+        color: var(--navy);
+        border-bottom: 1px solid #F0F1F5;
+    }
+    tr:last-child td { border-bottom: none; }
+    .row-avatar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .row-avatar .mini-avatar {
+        width: 26px; height: 26px;
+        border-radius: 50%;
+        background: var(--navy);
+        color: var(--amber);
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .badge {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: 20px;
+    }
+    .badge.active { background: #E7F7EF; color: var(--green); }
+
+    .quick-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .quick-actions a, .quick-actions button {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--bg);
+        border: 1px solid #E3E6ED;
+        border-radius: 9px;
+        padding: 12px 14px;
+        font-family: 'Inter', sans-serif;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--navy);
+        text-decoration: none;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+    }
+    .quick-actions a:hover, .quick-actions button:hover {
+        border-color: var(--amber);
+        background: var(--amber-dim);
+    }
+    .quick-actions .qi {
+        width: 28px; height: 28px;
+        border-radius: 7px;
+        background: var(--navy);
+        color: var(--amber);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    .activity-item {
+        display: flex;
+        gap: 12px;
+        font-size: 13px;
+    }
+    .activity-dot {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: var(--amber);
+        margin-top: 5px;
+        flex-shrink: 0;
+    }
+    .activity-item .a-text { color: var(--navy); }
+    .activity-item .a-text b { font-weight: 600; }
+    .activity-item .a-time {
+        color: var(--text-dim);
+        font-size: 11.5px;
+        margin-top: 2px;
+    }
+
+    .chart-wrap {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        height: 120px;
+        padding-top: 10px;
+    }
+    .chart-bar {
+        flex: 1;
+        background: linear-gradient(180deg, var(--amber) 0%, #FFC862 100%);
+        border-radius: 6px 6px 2px 2px;
+        position: relative;
+        min-height: 4px;
+    }
+    .chart-labels {
+        display: flex;
+        gap: 10px;
+        margin-top: 8px;
+    }
+    .chart-labels span {
+        flex: 1;
+        text-align: center;
+        font-size: 10.5px;
+        color: var(--text-dim);
+        font-weight: 600;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 44px 20px;
+    }
+    .empty-state svg {
+        margin-bottom: 14px;
+        opacity: 0.55;
+    }
+    .empty-state .title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        color: var(--navy);
+        font-size: 15px;
+        margin-bottom: 4px;
+    }
+    .empty-state .sub {
+        color: var(--text-dim);
+        font-size: 13px;
+        max-width: 320px;
+        margin: 0 auto;
+    }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand"><span class="brand-dot"></span>LABTRACK</div>
+    <div class="user-info">
+        <div class="avatar">{{ user.name[0] }}</div>
+        {{ user.name }} · Teacher
+        <a href="/class-chat" id="chatTopbarLink" style="position:relative; color: var(--amber); text-decoration:none; font-weight:600; font-size:12px;">
+            Class Chat
+            {% if unread_count > 0 %}
+            <span id="chatBadge" style="position:absolute; top:-9px; right:-16px; min-width:16px; height:16px; padding:0 3px; background:var(--red); color:white; border-radius:9px; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px var(--navy);">{{ unread_count }}</span>
+            {% endif %}
+        </a>
+        <a href="/logout" class="logout">Log out</a>
+    </div>
+</div>
+
+<div class="hero">
+    <div class="hero-inner">
+        <div>
+            <h1>Welcome back, {{ user.name.split(' ')[0] }} 👋</h1>
+            <p>Here's what's happening across your labs today.</p>
+        </div>
+        <div class="hero-date" id="todayDate"></div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="stats-row">
+        <div class="stat-card">
+            <div>
+                <div class="label">Total Students</div>
+                <div class="value">{{ total_students|default(0) }}</div>
+            </div>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/></svg>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div>
+                <div class="label">Active Labs</div>
+                <div class="value">{{ active_labs|default(0) }}</div>
+            </div>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2"><path d="M9 3h6l1 4h3a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a1 1 0 0 1 1-1h3l1-4z"/><circle cx="12" cy="13" r="3"/></svg>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div>
+                <div class="label">Pending Grading</div>
+                <div class="value">{{ pending_grading|default(0) }}</div>
+            </div>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div>
+                <div class="label">Avg. Class Score</div>
+                <div class="value">{{ avg_score|default('--') }}</div>
+            </div>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-4 4"/></svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <div>
+            <div class="panel-card">
+                <h2>Your Students</h2>
+                <p class="panel-sub">Everyone who has signed up as a student.</p>
+
+                {% if students %}
+                <table>
+                    <tr><th>Student</th><th>Email</th><th>Status</th></tr>
+                    {% for s in students %}
+                    <tr>
+                        <td>
+                            <div class="row-avatar">
+                                <div class="mini-avatar">{{ s.name[0] }}</div>
+                                {{ s.name }}
+                            </div>
+                        </td>
+                        <td>{{ s.email }}</td>
+                        <td><span class="badge active">Active</span></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="1.5">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
+                        <circle cx="10" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    <div class="title">No students yet</div>
+                    <div class="sub">Once students sign up, they'll appear here so you can start grading their labs.</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="panel-card">
+                <h2>Weekly Submissions</h2>
+                <p class="panel-sub">Lab submissions received per day this week.</p>
+                {% set chart = weekly_submissions|default([2,5,3,8,4,6,1]) %}
+                <div class="chart-wrap">
+                    {% for v in chart %}
+                    <div class="chart-bar" style="--h: {{ (v / (chart|max if chart|max > 0 else 1) * 100)|round }}%; height: var(--h);"></div>
+                    {% endfor %}
+                </div>
+                <div class="chart-labels">
+                    <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="panel-card">
+                <h2>Quick Actions</h2>
+                <div class="quick-actions">
+                    <a href="/create-lab">
+                        <div class="qi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+                        Create new lab
+                    </a>
+                    <a href="/manage-labs">
+                        <div class="qi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+                        Manage labs
+                    </a>
+
+                    <a href="/manage-batches">
+                        <div class="qi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/></svg></div>
+                        Manage batches
+                    </a>
+
+                    <a href="/grade-labs">
+                        <div class="qi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+                        Grade pending labs
+                    </a>
+                    <a href="/live-progress">
+                        <div class="qi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg></div>
+                        Live progress
+                    </a>
+                    <a href="/invite-student">
+                        <div class="qi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></div>
+                        Invite a student
+                    </a>
+                    <a href="/class-report">
+                        <div class="qi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-4 4"/></svg></div>
+                        View class report
+                    </a>
+                    <a href="/class-chat" id="chatQuickLink" style="position:relative;">
+                        <div class="qi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-4-1L3 21l1.5-5a8.38 8.38 0 0 1-1-4A8.5 8.5 0 0 1 12 3a8.38 8.38 0 0 1 9 8.5z"/></svg></div>
+                        Class chat
+                        {% if unread_count > 0 %}
+                        <span id="chatBadgeQuick" style="position:absolute; top:6px; right:8px; min-width:16px; height:16px; padding:0 3px; background:var(--red); color:white; border-radius:9px; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center;">{{ unread_count }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+
+            <div class="panel-card">
+                <h2>Recent Activity</h2>
+                <div class="activity-list">
+                    {% if recent_activity %}
+                        {% for a in recent_activity %}
+                        <div class="activity-item">
+                            <div class="activity-dot"></div>
+                            <div>
+                                <div class="a-text">{{ a.text }}</div>
+                                <div class="a-time">{{ a.time }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="activity-item">
+                            <div class="activity-dot"></div>
+                            <div>
+                                <div class="a-text">No activity yet — this feed fills up as students submit labs.</div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<audio id="notifSound" src="https://cdnjs.cloudflare.com/ajax/libs/ion-sound/3.0.7/sounds/bell_ring.mp3" preload="auto"></audio>
+
+<script>
+    document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    let lastCount = parseInt("{{ unread_count }}", 10);
+
+    function playNotifSound() {
+        const sound = document.getElementById('notifSound');
+        sound.play().catch(() => {});
+    }
+
+    function updateBadge(id, count) {
+        let badge = document.getElementById(id);
+        if (count > 0) {
+            if (!badge) {
+                return;
+            }
+            badge.textContent = count;
+            badge.style.display = 'flex';
+        } else if (badge) {
+            badge.style.display = 'none';
+        }
+    }
+
+    setInterval(() => {
+        fetch('/check-new-messages')
+            .then(res => res.json())
+            .then(data => {
+                const count = data.unread_count;
+
+                if (count > lastCount) {
+                    playNotifSound();
+                }
+
+                updateBadge('chatBadge', count);
+                updateBadge('chatBadgeQuick', count);
+
+                lastCount = count;
+            })
+            .catch(() => {});
+    }, 8000);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Class Chat - LabTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+    :root{
+        --navy: #14213D;
+        --navy-2: #1C2E52;
+        --amber: #FCA311;
+        --amber-dim: #FCA31133;
+        --bg: #F5F6F8;
+        --text-dim: #8A93A8;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); min-height: 100vh; }
+
+    .topbar {
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        color: white; padding: 18px 32px;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; }
+    .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 4px var(--amber-dim); }
+    .back-link { color: var(--amber); text-decoration: none; font-size: 13px; font-weight: 600; }
+
+    .page-wrap {
+        max-width: 780px;
+        margin: 32px auto 40px;
+        padding: 0 20px;
+    }
+
+    .chat-shell {
+        background: white;
+        border-radius: 18px;
+        box-shadow: 0 20px 44px rgba(20,33,61,0.14);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 74vh;
+    }
+
+    .chat-header {
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    .chat-header::before {
+        content: "";
+        position: absolute;
+        top: -60px; right: -40px;
+        width: 180px; height: 180px;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 50%;
+    }
+    .chat-header-icon {
+        width: 42px; height: 42px;
+        border-radius: 12px;
+        background: var(--amber);
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        position: relative; z-index: 1;
+    }
+    .chat-header-text {
+        position: relative; z-index: 1;
+    }
+    .chat-header-text h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        color: white;
+        font-size: 17px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .live-dot {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: #3EDC81;
+        box-shadow: 0 0 0 3px rgba(62,220,129,0.25);
+        animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse { 0%{opacity:1;} 50%{opacity:0.4;} 100%{opacity:1;} }
+    .chat-header-text span {
+        color: #9FACC9;
+        font-size: 11.5px;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .messages {
+        flex: 1; overflow-y: auto;
+        padding: 22px 22px 8px;
+        display: flex; flex-direction: column; gap: 14px;
+        background: var(--bg);
+    }
+
+    .msg-row { display: flex; align-items: flex-end; gap: 8px; max-width: 78%; }
+    .msg-row.mine { align-self: flex-end; flex-direction: row-reverse; }
+    .msg-row.other { align-self: flex-start; }
+
+    .mini-avatar {
+        width: 26px; height: 26px; border-radius: 50%;
+        background: var(--navy); color: var(--amber);
+        font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 10.5px;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .mini-avatar.teacher { background: var(--amber); color: var(--navy); }
+
+    .bubble { padding: 10px 14px; border-radius: 14px; font-size: 13.5px; line-height: 1.45; box-shadow: 0 2px 6px rgba(20,33,61,0.06); }
+    .msg-row.mine .bubble { background: var(--navy); color: white; border-bottom-right-radius: 3px; }
+    .msg-row.other .bubble { background: white; color: var(--navy); border-bottom-left-radius: 3px; }
+
+    .bubble .sender { font-size: 10.5px; font-weight: 700; opacity: 0.6; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.3px; }
+    .msg-row.mine .bubble .sender { color: var(--amber); opacity: 0.9; }
+    .bubble .time { font-size: 10px; opacity: 0.5; margin-top: 5px; }
+
+    .announcement {
+        align-self: center;
+        max-width: 92%;
+        background: white;
+        border: 1.5px solid var(--amber);
+        color: var(--navy);
+        padding: 12px 18px;
+        border-radius: 14px;
+        font-size: 12.5px;
+        font-weight: 600;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(252,163,17,0.15);
+    }
+    .announcement .a-tag {
+        display: inline-block;
+        background: var(--amber);
+        color: var(--navy);
+        font-size: 9.5px;
+        font-weight: 800;
+        padding: 2px 8px;
+        border-radius: 10px;
+        margin-bottom: 6px;
+        letter-spacing: 0.4px;
+    }
+    .announcement .a-time { display: block; font-size: 10px; font-weight: 500; opacity: 0.55; margin-top: 6px; }
+
+    .send-form {
+        display: flex; gap: 10px;
+        padding: 16px 20px;
+        border-top: 1px solid #F0F1F5;
+        background: white;
+        flex-shrink: 0;
+    }
+    .send-form input {
+        flex: 1; padding: 12px 16px;
+        border: 1.5px solid #E3E6ED; border-radius: 24px;
+        font-size: 14px; font-family: 'Inter', sans-serif;
+        background: #FAFBFC;
+    }
+    .send-form input:focus { outline: none; border-color: var(--amber); background: white; }
+    .send-form button {
+        background: var(--amber); color: var(--navy); border: none;
+        width: 44px; height: 44px; border-radius: 50%;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        transition: background 0.15s;
+    }
+    .send-form button:hover { background: #e6940c; }
+
+    .empty { text-align: center; color: var(--text-dim); margin: auto; padding: 40px 0; }
+    .empty svg { margin-bottom: 12px; opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand"><span class="brand-dot"></span>LABTRACK</div>
+    <a href="{{ '/teacher-dashboard' if user.role == 'teacher' else '/student-dashboard' }}" class="back-link">&larr; Back to dashboard</a>
+</div>
+
+<div class="page-wrap">
+    <div class="chat-shell">
+        <div class="chat-header">
+            <div class="chat-header-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-4-1L3 21l1.5-5a8.38 8.38 0 0 1-1-4A8.5 8.5 0 0 1 12 3a8.38 8.38 0 0 1 9 8.5z"/></svg>
+            </div>
+            <div class="chat-header-text">
+                <h1><span class="live-dot"></span>Class Chat</h1>
+                <span>Everyone in your class is here</span>
+            </div>
+        </div>
+
+        <div class="messages" id="messages">
+            {% if messages %}
+                {% for m in messages %}
+                    {% if 'New lab started' in m.text %}
+                    <div class="announcement">
+                        <span class="a-tag">LAB STARTED</span><br>
+                        {{ m.text }}
+                        <span class="a-time">{{ m.sender.name }} · {{ m.created_at.strftime("%b %d, %I:%M %p") }}</span>
+                    </div>
+                    {% else %}
+                    <div class="msg-row {{ 'mine' if m.sender_id == user.id else 'other' }}">
+                        <div class="mini-avatar {{ 'teacher' if m.sender.role == 'teacher' else '' }}">{{ m.sender.name[0] }}</div>
+                        <div class="bubble">
+                            <div class="sender">{{ m.sender.name }}{{ ' · teacher' if m.sender.role == 'teacher' else '' }}</div>
+                            {{ m.text }}
+                            <div class="time">{{ m.created_at.strftime("%I:%M %p") }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <div class="empty">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8A93A8" stroke-width="1.5"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-4-1L3 21l1.5-5a8.38 8.38 0 0 1-1-4A8.5 8.5 0 0 1 12 3a8.38 8.38 0 0 1 9 8.5z"/></svg>
+                    <div>No messages yet. Say hello!</div>
+                </div>
+            {% endif %}
+        </div>
+
+        <form class="send-form" method="POST" action="/class-chat">
+            <input type="text" name="text" placeholder="Type a message..." required autocomplete="off">
+            <button type="submit">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const box = document.getElementById('messages');
+    box.scrollTop = box.scrollHeight;
+</script>
+
+</body>
+</html>

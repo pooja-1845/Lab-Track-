@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Grade Labs - LabTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+    :root{
+        --navy: #14213D;
+        --navy-2: #1C2E52;
+        --amber: #FCA311;
+        --amber-dim: #FCA31133;
+        --bg: #F5F6F8;
+        --text-dim: #8A93A8;
+        --green: #1DAA6D;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+    }
+    .topbar {
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        color: white;
+        padding: 18px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .brand {
+        display: flex; align-items: center; gap: 10px;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600; font-size: 16px;
+    }
+    .brand-dot {
+        width: 10px; height: 10px; border-radius: 50%;
+        background: var(--amber);
+        box-shadow: 0 0 0 4px var(--amber-dim);
+    }
+    .back-link { color: var(--amber); text-decoration: none; font-size: 13px; font-weight: 600; }
+
+    .hero {
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        color: white;
+        padding: 0 32px 56px;
+        position: relative;
+        overflow: hidden;
+    }
+    .hero::before {
+        content: "";
+        position: absolute;
+        top: -80px; right: -80px;
+        width: 260px; height: 260px;
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 50%;
+    }
+    .hero-inner {
+        max-width: 860px;
+        margin: 0 auto;
+        padding-top: 30px;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    .hero-inner h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 26px;
+        margin: 0 0 6px;
+    }
+    .hero-inner p {
+        color: #AEB7CC;
+        font-size: 14px;
+        margin: 0;
+    }
+    .count-pill {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.15);
+        color: var(--amber);
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 13px;
+        padding: 9px 16px;
+        border-radius: 20px;
+    }
+
+    .wrap { max-width: 860px; margin: -30px auto 50px; padding: 0 20px; position: relative; z-index: 2; }
+
+    .sub-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 22px rgba(20,33,61,0.09);
+        padding: 20px 24px;
+        margin-bottom: 14px;
+        border-left: 3px solid var(--amber);
+    }
+    .sub-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+    .sub-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .sub-avatar {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        background: var(--navy);
+        color: var(--amber);
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .sub-info b { color: var(--navy); font-size: 15px; }
+    .sub-info .lab-name { color: var(--text-dim); font-size: 13px; margin-top: 2px; }
+    .sub-info .meta {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--text-dim);
+        font-size: 11.5px;
+        margin-top: 5px;
+    }
+    .sub-info .file-link {
+        display: inline-block;
+        margin-top: 6px;
+        font-size: 11.5px;
+        color: #B97300;
+        font-weight: 700;
+        text-decoration: none;
+        background: #FFF4E0;
+        padding: 4px 10px;
+        border-radius: 6px;
+    }
+    .sub-info .file-link:hover { background: #FCEBC7; }
+
+    .code-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 6px;
+    }
+    .code-box {
+        background: #0D1526;
+        color: #B6F09C;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12.5px;
+        padding: 14px;
+        border-radius: 8px;
+        white-space: pre-wrap;
+        max-height: 220px;
+        overflow-y: auto;
+        margin-bottom: 14px;
+    }
+
+    .download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #EEF0F4;
+        color: var(--navy);
+        border: none;
+        padding: 8px 14px;
+        border-radius: 7px;
+        font-weight: 700;
+        font-size: 12px;
+        cursor: pointer;
+        text-decoration: none;
+        margin-bottom: 14px;
+    }
+    .download-btn:hover { background: #E3E6ED; }
+
+    .grade-block {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+    .grade-form {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    .grade-form input {
+        width: 90px;
+        padding: 10px 12px;
+        border: 1.5px solid #E3E6ED;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--navy);
+        text-align: center;
+    }
+    .grade-form input:focus { outline: none; border-color: var(--amber); box-shadow: 0 0 0 3px var(--amber-dim); }
+    .grade-form button {
+        background: var(--navy);
+        color: var(--amber);
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .grade-form button:hover { background: var(--navy-2); }
+
+    .visibility-form button {
+        background: #EEF0F4;
+        color: var(--navy);
+        border: none;
+        padding: 7px 14px;
+        border-radius: 7px;
+        font-size: 11.5px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .visibility-form button.shown {
+        background: #E7F7EF;
+        color: var(--green);
+    }
+    .visibility-form button.hidden {
+        background: #FFF4E0;
+        color: #B97300;
+    }
+
+    .empty-state {
+        text-align: center;
+        background: white;
+        border-radius: 14px;
+        padding: 60px 20px;
+        box-shadow: 0 10px 22px rgba(20,33,61,0.07);
+    }
+    .empty-state .check-icon {
+        width: 60px; height: 60px;
+        border-radius: 50%;
+        background: #E7F7EF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+    }
+    .empty-state .title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        color: var(--navy);
+        font-size: 17px;
+        margin-bottom: 6px;
+    }
+    .empty-state .sub {
+        color: var(--text-dim);
+        font-size: 13.5px;
+    }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand"><span class="brand-dot"></span>LABTRACK</div>
+    <a href="/teacher-dashboard" class="back-link">&larr; Back to dashboard</a>
+</div>
+
+<div class="hero">
+    <div class="hero-inner">
+        <div>
+            <h1>Grade Pending Labs</h1>
+            <p>Review submissions and enter scores below.</p>
+        </div>
+        <div class="count-pill">{{ pending|length }} pending</div>
+    </div>
+</div>
+
+<div class="wrap">
+    {% if pending %}
+        {% for sub in pending %}
+        <div class="sub-card">
+            <div class="sub-top">
+                <div class="sub-left">
+                    <div class="sub-avatar">{{ sub.student.name[0] }}</div>
+                    <div class="sub-info">
+                        <b>{{ sub.student.name }}</b>
+                        <div class="lab-name">{{ sub.lab.title }}</div>
+                        <div class="meta">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A93A8" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+                            Submitted {{ sub.submitted_at | ist }}
+                        </div>
+                        {% if sub.file_path %}
+                        <a href="/download-file/{{ sub.file_path }}" class="file-link">📎 Download attached file</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-label">Student's Code / Answer</div>
+            <div class="code-box">{{ sub.code_content or 'No code/answer saved yet.' }}</div>
+
+            {% if sub.output %}
+            <div class="code-label">Program Output</div>
+            <div class="code-box">{{ sub.output }}</div>
+            {% endif %}
+
+            <a href="/download-code/{{ sub.id }}" class="download-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+                Download Code
+            </a>
+
+            <div class="grade-block">
+                <form class="grade-form" method="POST" action="/grade/{{ sub.id }}">
+                    <input type="number" name="score" step="0.1" min="0" max="100" placeholder="0-100" required>
+                    <button type="submit">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                        Save
+                    </button>
+                </form>
+                <form class="visibility-form" method="POST" action="/toggle-visibility/{{ sub.id }}">
+                    <button type="submit" class="{{ 'shown' if sub.marks_visible else 'hidden' }}">
+                        {{ 'Marks Visible — click to hide' if sub.marks_visible else 'Marks Hidden — click to show' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="check-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1DAA6D" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <div class="title">All caught up!</div>
+            <div class="sub">There are no pending submissions to grade right now.</div>
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

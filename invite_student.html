@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invite a Student - LabTrack</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f9; }
+        .navbar { background: #14213D; color: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar a { color: #FCA311; text-decoration: none; font-weight: bold; }
+        .logo { font-weight: bold; font-size: 20px; }
+        .logo span { color: #FCA311; }
+        .container { max-width: 600px; margin: 40px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-top: 4px solid #FCA311; }
+        h2 { color: #14213D; }
+        select { width: 100%; padding: 10px; margin: 10px 0 20px 0; border-radius: 5px; border: 1px solid #ccc; }
+        .student-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #eee; }
+        .student-info { display: flex; align-items: center; gap: 10px; }
+        .student-name { font-weight: bold; color: #14213D; }
+        .student-email { color: #888; font-size: 13px; }
+        .invite-btn { background: #FCA311; color: #14213D; border: none; padding: 8px 16px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .invite-btn:hover { background: #e59400; }
+        .empty { color: #888; padding: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">🟠 LAB<span>TRACK</span></div>
+        <a href="/teacher-dashboard">← Back to dashboard</a>
+    </div>
+
+    <div class="container">
+        <h2>Invite a Student</h2>
+
+        <form method="GET" action="/invite-student" id="labForm">
+            <label>Select Lab:</label>
+            <select name="lab_id" onchange="document.getElementById('labForm').submit()">
+                {% for lab in labs %}
+                    <option value="{{ lab.id }}" {% if lab.id == selected_lab_id %}selected{% endif %}>
+                        {{ lab.title }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+
+        <h3>Available Students:</h3>
+
+        {% if available_students %}
+            {% for student in available_students %}
+                <div class="student-row">
+                    <div class="student-info">
+                        <input type="checkbox" disabled>
+                        <div>
+                            <div class="student-name">{{ student.name }}</div>
+                            <div class="student-email">{{ student.email }}</div>
+                        </div>
+                    </div>
+                    <form method="POST" action="/invite-student">
+                        <input type="hidden" name="lab_id" value="{{ selected_lab_id }}">
+                        <input type="hidden" name="student_id" value="{{ student.id }}">
+                        <button type="submit" class="invite-btn">Invite</button>
+                    </form>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="empty">No students available to invite (everyone's already invited, or no students signed up yet).</p>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lab Created - LabTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+<style>
+    :root{
+        --navy: #14213D;
+        --navy-2: #1C2E52;
+        --amber: #FCA311;
+        --amber-dim: #FCA31133;
+        --bg: #F5F6F8;
+        --text-dim: #8A93A8;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+    .card {
+        background: white;
+        max-width: 480px;
+        width: 100%;
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(20,33,61,0.15);
+        padding: 44px 40px;
+        text-align: center;
+        border-top: 4px solid var(--amber);
+    }
+    .check-icon {
+        width: 60px; height: 60px;
+        border-radius: 50%;
+        background: #E7F7EF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+    h2 {
+        font-family: 'Space Grotesk', sans-serif;
+        color: var(--navy);
+        font-size: 22px;
+        margin: 0 0 6px;
+    }
+    p.lab-title {
+        color: var(--text-dim);
+        font-size: 14px;
+        margin: 0 0 26px;
+    }
+    .code-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+    }
+    .code-box {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 34px;
+        font-weight: 600;
+        letter-spacing: 6px;
+        color: var(--navy);
+        background: var(--amber-dim);
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 28px;
+    }
+    a.btn {
+        display: inline-block;
+        background: var(--navy);
+        color: var(--amber);
+        text-decoration: none;
+        padding: 13px 26px;
+        border-radius: 9px;
+        font-weight: 700;
+        font-size: 14px;
+    }
+    a.btn:hover { background: var(--navy-2); }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <div class="check-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1DAA6D" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <h2>Lab Created!</h2>
+    <p class="lab-title">{{ lab.title }}</p>
+
+    <div class="code-label">Class Code</div>
+    <div class="code-box">{{ lab.class_code }}</div>
+
+    <a href="/teacher-dashboard" class="btn">Go to Dashboard</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Live Progress - LabTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+    :root{
+        --navy: #14213D;
+        --navy-2: #1C2E52;
+        --amber: #FCA311;
+        --amber-dim: #FCA31133;
+        --bg: #F5F6F8;
+        --text-dim: #8A93A8;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); min-height: 100vh; }
+    .topbar {
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        color: white; padding: 18px 32px;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; }
+    .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 4px var(--amber-dim); }
+    .back-link { color: var(--amber); text-decoration: none; font-size: 13px; font-weight: 600; }
+
+    .hero {
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        color: white; padding: 0 32px 56px; position: relative; overflow: hidden;
+    }
+    .hero-inner {
+        max-width: 900px; margin: 0 auto; padding-top: 30px; position: relative; z-index: 1;
+        display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 14px;
+    }
+    .hero-inner h1 { font-family: 'Space Grotesk', sans-serif; font-size: 26px; margin: 0 0 6px; }
+    .hero-inner p { color: #AEB7CC; font-size: 14px; margin: 0; }
+
+    .refresh-btn {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.15);
+        color: var(--amber);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 9px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .refresh-btn:hover { background: rgba(255,255,255,0.14); }
+
+    .wrap { max-width: 900px; margin: -30px auto 50px; padding: 0 20px; position: relative; z-index: 2; }
+
+    .search-box {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 24px rgba(20,33,61,0.08);
+        padding: 14px 18px;
+        margin-bottom: 20px;
+    }
+    .search-box input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1.5px solid #E3E6ED;
+        border-radius: 8px;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        color: var(--navy);
+    }
+    .search-box input:focus { outline: none; border-color: var(--amber); }
+
+    .lab-panel {
+        background: white; border-radius: 14px;
+        box-shadow: 0 10px 24px rgba(20,33,61,0.08);
+        padding: 24px; margin-bottom: 20px;
+        border-top: 3px solid var(--amber);
+    }
+    .lab-panel h2 {
+        font-family: 'Space Grotesk', sans-serif; font-size: 17px; color: var(--navy);
+        margin: 0 0 4px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .lab-count {
+        font-size: 11.5px; font-weight: 700; color: var(--text-dim);
+        background: var(--bg); padding: 4px 10px; border-radius: 20px;
+        white-space: nowrap;
+    }
+
+    .progress-track {
+        background: #EEF0F4;
+        border-radius: 10px;
+        height: 8px;
+        margin-bottom: 16px;
+        overflow: hidden;
+    }
+    .progress-fill {
+        background: #1DAA6D;
+        height: 100%;
+        width: 0%;
+    }
+
+    .student-item {
+        border-top: 1px solid #F0F1F5;
+    }
+    .student-item:first-of-type { border-top: none; }
+
+    .student-item summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 14px 4px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+    .student-item summary::-webkit-details-marker { display: none; }
+
+    .student-left { display: flex; align-items: center; gap: 10px; }
+    .mini-avatar {
+        width: 28px; height: 28px; border-radius: 50%;
+        background: var(--navy); color: var(--amber);
+        font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 11px;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .student-name { font-weight: 600; color: var(--navy); font-size: 14px; }
+
+    .status-pill { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+    .status-pill.pending { background: #FFF4E0; color: #B97300; }
+    .status-pill.graded { background: #E7F7EF; color: #1DAA6D; }
+
+    .arrow { transition: transform 0.15s; color: var(--text-dim); }
+    .student-item[open] .arrow { transform: rotate(90deg); }
+
+    .code-box {
+        background: #14213D;
+        color: #E7ECF5;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12.5px;
+        padding: 14px 16px;
+        border-radius: 8px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 260px;
+        overflow-y: auto;
+        margin: 0 4px 14px;
+    }
+    .no-code { color: var(--text-dim); font-size: 13px; font-style: italic; margin: 0 4px 14px; }
+
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-dim); }
+
+    .last-updated {
+        text-align: center;
+        font-size: 11.5px;
+        color: var(--text-dim);
+        margin-top: -8px;
+        margin-bottom: 16px;
+    }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand"><span class="brand-dot"></span>LABTRACK</div>
+    <a href="/teacher-dashboard" class="back-link">&larr; Back to dashboard</a>
+</div>
+
+<div class="hero">
+    <div class="hero-inner">
+        <div>
+            <h1>Live Progress</h1>
+            <p>See what every student is coding, right now — no need to walk around the lab.</p>
+        </div>
+        <button class="refresh-btn" onclick="location.reload()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Refresh Now
+        </button>
+    </div>
+</div>
+
+<div class="wrap">
+    <div class="last-updated" id="lastUpdated"></div>
+
+    <div class="search-box">
+        <input type="text" id="studentSearch" placeholder="Search student by name...">
+    </div>
+
+    {% if lab_data %}
+        {% for item in lab_data %}
+        <div class="lab-panel">
+            <h2>
+                {{ item.lab.title }}
+                <span class="lab-count">{{ item.started }}/{{ total_students }} started ({{ item.percent }}%)</span>
+            </h2>
+            <div class="progress-track">
+                <div class="progress-fill" data-percent="{{ item.percent }}"></div>
+            </div>
+
+            {% if item.submissions %}
+                {% for sub in item.submissions %}
+                <details class="student-item" data-name="{{ sub.student.name|lower }}">
+                    <summary>
+                        <div class="student-left">
+                            <div class="mini-avatar">{{ sub.student.name[0] }}</div>
+                            <span class="student-name">{{ sub.student.name }}</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            {% if sub.status == 'graded' %}
+                                <span class="status-pill graded">Graded: {{ sub.score }}</span>
+                            {% else %}
+                                <span class="status-pill pending">In progress</span>
+                            {% endif %}
+                            <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                        </div>
+                    </summary>
+                    {% if sub.code_content %}
+                        <div class="code-box">{{ sub.code_content }}</div>
+                    {% else %}
+                        <div class="no-code">No code written yet.</div>
+                    {% endif %}
+                    {% if sub.file_path %}
+                        <a href="/download-file/{{ sub.file_path }}" style="display:inline-block; margin: 0 4px 14px; font-size:11.5px; color:#B97300; font-weight:700; text-decoration:none; background:#FFF4E0; padding:5px 12px; border-radius:6px;">📎 Download attached file</a>
+                    {% endif %}
+                </details>
+                {% endfor %}
+            {% else %}
+                <div class="no-code">No students have started this lab yet.</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">You haven't created any labs yet.</div>
+    {% endif %}
+</div>
+
+<script>
+    document.querySelectorAll('.progress-fill').forEach(function (bar) {
+        var percent = bar.getAttribute('data-percent');
+        bar.style.width = percent + '%';
+    });
+
+    var searchBox = document.getElementById('studentSearch');
+    searchBox.addEventListener('keyup', function () {
+        var query = searchBox.value.toLowerCase();
+        document.querySelectorAll('.student-item').forEach(function (item) {
+            var name = item.getAttribute('data-name');
+            item.style.display = name.indexOf(query) !== -1 ? '' : 'none';
+        });
+    });
+
+    document.getElementById('lastUpdated').textContent =
+        'Last updated: ' + new Date().toLocaleTimeString();
+
+    setInterval(function () {
+        if (!document.hidden) {
+            location.reload();
+        }
+    }, 8000);
+
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) {
+            location.reload();
+        }
+    });
+</script>
+
+</body>
+</html>

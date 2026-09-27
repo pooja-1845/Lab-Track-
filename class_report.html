@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Class Report - LabTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+    :root{
+        --navy: #14213D;
+        --navy-2: #1C2E52;
+        --amber: #FCA311;
+        --amber-dim: #FCA31133;
+        --bg: #F5F6F8;
+        --text-dim: #8A93A8;
+        --green: #1DAA6D;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+    }
+    .topbar {
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        color: white;
+        padding: 18px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .brand {
+        display: flex; align-items: center; gap: 10px;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600; font-size: 16px;
+    }
+    .brand-dot {
+        width: 10px; height: 10px; border-radius: 50%;
+        background: var(--amber);
+        box-shadow: 0 0 0 4px var(--amber-dim);
+    }
+    .back-link { color: var(--amber); text-decoration: none; font-size: 13px; font-weight: 600; }
+
+    .hero {
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        color: white;
+        padding: 0 32px 60px;
+        position: relative;
+        overflow: hidden;
+    }
+    .hero::before {
+        content: "";
+        position: absolute;
+        top: -80px; right: -80px;
+        width: 260px; height: 260px;
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 50%;
+    }
+    .hero-inner {
+        max-width: 980px;
+        margin: 0 auto;
+        padding-top: 30px;
+        position: relative;
+        z-index: 1;
+    }
+    .hero-top {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 6px;
+    }
+    .hero-icon {
+        width: 42px; height: 42px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .hero-inner h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 26px;
+        margin: 0;
+    }
+    .hero-inner p {
+        color: #AEB7CC;
+        font-size: 14px;
+        margin: 4px 0 0 56px;
+    }
+
+    .container {
+        max-width: 980px;
+        margin: -30px auto 0;
+        padding: 0 24px 50px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 24px rgba(20,33,61,0.10);
+        border-top: 3px solid var(--amber);
+    }
+    .stat-card .label {
+        font-size: 11px;
+        color: var(--text-dim);
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+    }
+    .stat-card .value {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 26px;
+        color: var(--navy);
+        margin-top: 6px;
+    }
+
+    .panel-card {
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 10px 24px rgba(20,33,61,0.08);
+        padding: 26px;
+    }
+    .panel-card h2 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 16px;
+        color: var(--navy);
+        margin: 0 0 4px;
+    }
+    .panel-card .panel-sub {
+        color: var(--text-dim);
+        font-size: 13px;
+        margin: 0 0 20px;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+        text-align: left;
+        font-size: 11px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        padding: 10px 8px;
+        border-bottom: 1.5px solid #E3E6ED;
+    }
+    td {
+        padding: 15px 8px;
+        font-size: 14px;
+        color: var(--navy);
+        border-bottom: 1px solid #F0F1F5;
+    }
+    tr:last-child td { border-bottom: none; }
+
+    .lab-cell { display: flex; align-items: center; gap: 10px; }
+    .lab-icon {
+        width: 30px; height: 30px;
+        border-radius: 8px;
+        background: var(--amber-dim);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .lab-cell b { font-weight: 600; }
+
+    .progress-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .progress-bar {
+        width: 90px;
+        height: 6px;
+        background: #EEF0F4;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .progress-fill {
+        height: 100%;
+        background: var(--green);
+        border-radius: 4px;
+    }
+    .progress-text { font-size: 12px; color: var(--text-dim); white-space: nowrap; }
+
+    .score-badge {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 13.5px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        background: var(--amber-dim);
+        color: #B97300;
+    }
+
+    .mini-avatar {
+        width: 26px; height: 26px; border-radius: 50%;
+        background: var(--navy); color: var(--amber);
+        font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 11px;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .student-cell { display: flex; align-items: center; gap: 10px; }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+    .empty-state .icon-wrap {
+        width: 60px; height: 60px;
+        border-radius: 50%;
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+    }
+    .empty-state .title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        color: var(--navy);
+        font-size: 16px;
+        margin-bottom: 6px;
+    }
+    .empty-state .sub {
+        color: var(--text-dim);
+        font-size: 13.5px;
+    }
+
+    .batch-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 14px;
+    }
+    .batch-heading .batch-pill {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--navy);
+        background: var(--amber-dim);
+        padding: 5px 14px;
+        border-radius: 20px;
+    }
+    .batch-heading .batch-count {
+        font-size: 12px;
+        color: var(--text-dim);
+    }
+    .batch-section {
+        margin-bottom: 22px;
+    }
+    .batch-section:last-child {
+        margin-bottom: 0;
+    }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand"><span class="brand-dot"></span>LABTRACK</div>
+    <a href="/teacher-dashboard" class="back-link">&larr; Back to dashboard</a>
+</div>
+
+<div class="hero">
+    <div class="hero-inner">
+        <div class="hero-top">
+            <div class="hero-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FCA311" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-4 4"/></svg>
+            </div>
+            <h1>Class Report</h1>
+        </div>
+        <p>Submission and grading stats across all your labs.</p>
+    </div>
+</div>
+
+<div class="container">
+    {% set total_labs = report|length %}
+    {% set total_subs = report|sum(attribute='total_submissions') %}
+    {% set total_graded = report|sum(attribute='graded') %}
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="label">Total Labs</div>
+            <div class="value">{{ total_labs }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Total Submissions</div>
+            <div class="value">{{ total_subs }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Total Graded</div>
+            <div class="value">{{ total_graded }}</div>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <h2>Lab Breakdown</h2>
+        <p class="panel-sub">Performance for each lab you've created.</p>
+
+        {% if report %}
+        <table>
+            <tr>
+                <th>Lab</th>
+                <th>Submissions</th>
+                <th>Grading Progress</th>
+                <th>Avg. Score</th>
+            </tr>
+            {% for r in report %}
+            <tr>
+                <td>
+                    <div class="lab-cell">
+                        <div class="lab-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2"><path d="M9 3h6l1 4h3a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a1 1 0 0 1 1-1h3l1-4z"/><circle cx="12" cy="13" r="3"/></svg>
+                        </div>
+                        <b>{{ r.title }}</b>
+                    </div>
+                </td>
+                <td>{{ r.total_submissions }}</td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="--w: {{ ((r.graded / r.total_submissions * 100) if r.total_submissions > 0 else 0)|round }}%; width: var(--w);"></div>
+                        </div>
+                        <span class="progress-text">{{ r.graded }}/{{ r.total_submissions }}</span>
+                    </div>
+                </td>
+                <td>
+                    {% if r.avg_score != '--' %}
+                        <span class="score-badge">{{ r.avg_score }}</span>
+                    {% else %}
+                        <span style="color: var(--text-dim);">--</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="icon-wrap">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8A93A8" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-4 4"/></svg>
+            </div>
+            <div class="title">No labs created yet</div>
+            <div class="sub">Create a lab first to see report data here.</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="panel-card" style="margin-top:20px;">
+        <h2>Student-Wise Report</h2>
+        <p class="panel-sub">Practicals attempted and average score, grouped by batch.</p>
+
+        {% if batch_reports %}
+            {% for b in batch_reports %}
+            <div class="batch-section">
+                <div class="batch-heading">
+                    <span class="batch-pill">{{ b.batch_name }}</span>
+                    <span class="batch-count">{{ b.students|length }} student{{ 's' if b.students|length != 1 else '' }}</span>
+                </div>
+                <table>
+                    <tr>
+                        <th>Student</th>
+                        <th>Practicals Attempted</th>
+                        <th>Avg. Score</th>
+                    </tr>
+                    {% for s in b.students %}
+                    <tr>
+                        <td>
+                            <div class="student-cell">
+                                <div class="mini-avatar">{{ s.name[0] }}</div>
+                                {{ s.name }}
+                            </div>
+                        </td>
+                        <td>{{ s.attempted }} / {{ s.total }}</td>
+                        <td>
+                            {% if s.avg_score != '--' %}
+                                <span class="score-badge">{{ s.avg_score }}</span>
+                            {% else %}
+                                <span style="color: var(--text-dim);">--</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="sub">No students yet.</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

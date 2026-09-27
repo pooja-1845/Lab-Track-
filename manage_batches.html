@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manage Batches - LabTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+    :root{
+        --navy: #14213D;
+        --navy-2: #1C2E52;
+        --amber: #FCA311;
+        --amber-dim: #FCA31133;
+        --bg: #F5F6F8;
+        --text-dim: #8A93A8;
+        --green: #1DAA6D;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); min-height: 100vh; }
+    .topbar {
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        color: white; padding: 18px 32px;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; }
+    .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 4px var(--amber-dim); }
+    .back-link { color: var(--amber); text-decoration: none; font-size: 13px; font-weight: 600; }
+
+    .hero {
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        color: white; padding: 0 32px 56px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+        content: ""; position: absolute; top: -80px; right: -80px;
+        width: 260px; height: 260px; border: 1px solid rgba(255,255,255,0.07); border-radius: 50%;
+    }
+    .hero-inner { max-width: 800px; margin: 0 auto; padding-top: 30px; position: relative; z-index: 1; }
+    .hero-inner h1 { font-family: 'Space Grotesk', sans-serif; font-size: 26px; margin: 0 0 6px; }
+    .hero-inner p { color: #AEB7CC; font-size: 14px; margin: 0; }
+
+    .wrap { max-width: 800px; margin: -30px auto 50px; padding: 0 20px; position: relative; z-index: 2; }
+
+    .card {
+        background: white; border-radius: 14px;
+        box-shadow: 0 10px 24px rgba(20,33,61,0.08);
+        padding: 26px; margin-bottom: 20px;
+        border-top: 3px solid var(--amber);
+    }
+    .card h2 { font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: var(--navy); margin: 0 0 4px; }
+    .card .card-sub { color: var(--text-dim); font-size: 13px; margin: 0 0 18px; }
+
+    .add-form { display: flex; gap: 10px; margin-bottom: 18px; }
+    .add-form input {
+        flex: 1; padding: 12px 14px; border: 1.5px solid #E3E6ED; border-radius: 9px;
+        font-size: 14px; font-family: 'Inter', sans-serif; color: var(--navy);
+    }
+    .add-form input:focus { outline: none; border-color: var(--amber); box-shadow: 0 0 0 4px var(--amber-dim); }
+    .btn {
+        background: var(--navy); color: var(--amber); border: none;
+        padding: 12px 20px; border-radius: 9px; font-weight: 700; font-size: 13.5px; cursor: pointer;
+        white-space: nowrap;
+    }
+    .btn:hover { background: var(--navy-2); }
+
+    .batch-pill {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: var(--amber-dim); color: #B97300;
+        padding: 7px 16px; border-radius: 20px;
+        font-weight: 700; font-size: 12.5px;
+        margin: 4px 8px 4px 0;
+    }
+    .batch-pill svg { flex-shrink: 0; }
+
+    .student-row {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 14px 6px; border-bottom: 1px solid #F0F1F5;
+        gap: 12px; flex-wrap: wrap;
+    }
+    .student-row:last-child { border-bottom: none; }
+    .student-left { display: flex; align-items: center; gap: 10px; }
+    .mini-avatar {
+        width: 30px; height: 30px; border-radius: 50%;
+        background: var(--navy); color: var(--amber);
+        font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12px;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .student-name { font-weight: 600; color: var(--navy); font-size: 14px; }
+    .student-email { color: var(--text-dim); font-size: 12px; margin-top: 2px; }
+
+    .assign-form { display: flex; gap: 8px; align-items: center; }
+    .assign-form select {
+        padding: 9px 12px; border: 1.5px solid #E3E6ED; border-radius: 7px;
+        font-size: 13px; font-family: 'Inter', sans-serif; color: var(--navy);
+    }
+    .assign-btn {
+        background: var(--amber); color: var(--navy); border: none;
+        padding: 9px 16px; border-radius: 7px; font-weight: 700; font-size: 12.5px; cursor: pointer;
+    }
+    .assign-btn:hover { background: #e6940c; }
+
+    .empty {
+        text-align: center; color: var(--text-dim); font-size: 13px; padding: 24px 0;
+    }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand"><span class="brand-dot"></span>LABTRACK</div>
+    <a href="/teacher-dashboard" class="back-link">&larr; Back to dashboard</a>
+</div>
+
+<div class="hero">
+    <div class="hero-inner">
+        <h1>Manage Batches</h1>
+        <p>Group your students so you can assign labs to specific sections.</p>
+    </div>
+</div>
+
+<div class="wrap">
+    <div class="card">
+        <h2>Create a Batch</h2>
+        <p class="card-sub">e.g. "Batch A - Morning" or "Div 2 - CE"</p>
+        <form class="add-form" method="POST" action="/manage-batches">
+            <input type="text" name="name" placeholder="Batch name" required>
+            <button type="submit" class="btn">+ Add Batch</button>
+        </form>
+
+        {% if batches %}
+            {% for b in batches %}
+            <span class="batch-pill">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/></svg>
+                {{ b.name }}
+            </span>
+            {% endfor %}
+        {% else %}
+            <div class="empty">No batches yet — add one above to get started.</div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Assign Students to a Batch</h2>
+        <p class="card-sub">Students not yet assigned to any batch.</p>
+
+        {% if unassigned %}
+            {% for s in unassigned %}
+            <div class="student-row">
+                <div class="student-left">
+                    <div class="mini-avatar">{{ s.name[0] }}</div>
+                    <div>
+                        <div class="student-name">{{ s.name }}</div>
+                        <div class="student-email">{{ s.email }}</div>
+                    </div>
+                </div>
+                <form class="assign-form" method="POST" action="/assign-batch">
+                    <input type="hidden" name="student_id" value="{{ s.id }}">
+                    <select name="batch_id" required>
+                        <option value="">Select batch</option>
+                        {% for b in batches %}
+                        <option value="{{ b.id }}">{{ b.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="assign-btn">Assign</button>
+                </form>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty">All students are already assigned to a batch.</div>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

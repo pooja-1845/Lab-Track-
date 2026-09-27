@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login - LabTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+    :root{
+        --navy: #14213D;
+        --navy-2: #1C2E52;
+        --amber: #FCA311;
+        --amber-dim: #FCA31133;
+        --bg: #F5F6F8;
+        --text-dim: #8A93A8;
+        --green: #1DAA6D;
+        --white: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background:
+            radial-gradient(circle at 20% 20%, rgba(252,163,17,0.06) 0%, transparent 40%),
+            radial-gradient(circle at 80% 80%, rgba(20,33,61,0.05) 0%, transparent 40%),
+            var(--bg);
+        background-image:
+            radial-gradient(circle, #D9DEE8 1px, transparent 1px),
+            var(--bg);
+        background-size: 26px 26px, 100% 100%;
+    }
+
+    .wrap {
+        display: flex;
+        width: 100%;
+        max-width: 960px;
+        min-height: 600px;
+        background: var(--white);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 30px 70px rgba(20,33,61,0.28);
+        border: 1px solid rgba(252,163,17,0.25);
+    }
+
+    .panel {
+        flex: 1;
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        color: white;
+        padding: 46px 42px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+    }
+    .blob { position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,0.08); }
+    .blob-1 { top: -90px; right: -90px; width: 260px; height: 260px; animation: float1 9s ease-in-out infinite; }
+    .blob-2 { bottom: -60px; left: -70px; width: 200px; height: 200px; border-color: rgba(255,255,255,0.06); animation: float2 11s ease-in-out infinite; }
+    .glow { position: absolute; top: -60px; left: -60px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(252,163,17,0.18) 0%, transparent 70%); pointer-events: none; animation: pulseGlow 4s ease-in-out infinite; }
+    @keyframes float1 { 0%,100%{transform:translateY(0) rotate(0);} 50%{transform:translateY(24px) rotate(12deg);} }
+    @keyframes float2 { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-18px);} }
+    @keyframes pulseGlow { 0%,100%{opacity:0.7;} 50%{opacity:1;} }
+
+    .brand {
+        display: flex; align-items: center; gap: 10px;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600; font-size: 16px;
+        position: relative; z-index: 1;
+        opacity: 0; animation: fadeUp 0.6s ease 0.1s forwards;
+    }
+    .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 4px var(--amber-dim); animation: pulse 1.6s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+    .panel h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 30px;
+        font-weight: 800;
+        line-height: 1.25;
+        margin: 26px 0 10px;
+        position: relative; z-index: 1;
+        opacity: 0; animation: fadeUp 0.6s ease 0.2s forwards;
+    }
+    .panel h1 span {
+        background: linear-gradient(90deg, var(--amber), #ffcf70, var(--amber));
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: shimmerText 3s linear infinite;
+    }
+    @keyframes shimmerText { to { background-position: 200% center; } }
+
+    .panel p.sub {
+        color: #AEB7CC;
+        font-size: 13.5px;
+        line-height: 1.6;
+        max-width: 300px;
+        margin: 0 0 24px;
+        position: relative; z-index: 1;
+        opacity: 0; animation: fadeUp 0.6s ease 0.3s forwards;
+    }
+
+    .mock-window {
+        background: #0D1526;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.08);
+        position: relative; z-index: 1;
+        margin-bottom: 22px;
+        opacity: 0; animation: fadeUp 0.6s ease 0.4s forwards;
+        box-shadow: 0 0 30px rgba(252,163,17,0.08);
+    }
+    .mock-titlebar { background: #131F38; padding: 8px 12px; display: flex; align-items: center; gap: 6px; }
+    .mock-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .mock-dot.r { background: #FF5F57; } .mock-dot.y { background: #FEBC2E; } .mock-dot.g { background: #28C840; }
+    .mock-body { padding: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #B6F09C; line-height: 1.7; min-height: 44px; white-space: pre; }
+    .mock-body .kw { color: #FCA311; }
+    .mock-body .str { color: #7EC9F5; }
+    .typed-cursor { display:inline-block; width:6px; height:12px; background:var(--amber); margin-left:2px; vertical-align:middle; animation: blink 0.8s step-end infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .checklist { display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 1; }
+    .checklist .item {
+        display: flex; align-items: center; gap: 9px;
+        font-size: 12.5px; color: #DCE1EC;
+        opacity: 0; animation: fadeUp 0.5s ease forwards;
+    }
+    .checklist .item:nth-child(1) { animation-delay: 0.5s; }
+    .checklist .item:nth-child(2) { animation-delay: 0.6s; }
+    .checklist .item:nth-child(3) { animation-delay: 0.7s; }
+    .checklist .item .tick {
+        width: 18px; height: 18px; border-radius: 50%;
+        background: rgba(62,220,129,0.15);
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; color: #3EDC81; font-size: 10px; font-weight: 800;
+    }
+
+    @keyframes fadeUp { from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+
+    .panel-footer { font-size: 11.5px; color: #7C8598; position: relative; z-index: 1; }
+
+    .form-side {
+        flex: 1;
+        padding: 50px 46px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .form-side h2 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 25px;
+        color: var(--navy);
+        margin: 0 0 6px;
+    }
+    .form-side p.lead {
+        color: var(--text-dim);
+        font-size: 14px;
+        margin: 0 0 28px;
+    }
+    .error-msg {
+        background: #FDEDED;
+        border: 1px solid #F5C2C2;
+        color: #B42318;
+        font-size: 13px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        margin-bottom: 18px;
+    }
+    .field { margin-bottom: 18px; }
+    .field label {
+        display: block;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: var(--navy);
+        margin-bottom: 7px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+    .field-input-wrap { position: relative; }
+    .field-input-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-dim); pointer-events: none; }
+    .field-input-wrap:focus-within svg { color: var(--amber); }
+    .field input {
+        width: 100%;
+        padding: 13px 14px 13px 40px;
+        border: 1.5px solid #E3E6ED;
+        border-radius: 9px;
+        font-size: 14px;
+        font-family: 'Inter', sans-serif;
+        color: var(--navy);
+        background: #FAFBFC;
+        transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus {
+        outline: none;
+        border-color: var(--amber);
+        background: white;
+        box-shadow: 0 0 0 4px var(--amber-dim);
+    }
+    button.submit {
+        width: 100%;
+        padding: 14px;
+        margin-top: 6px;
+        background: linear-gradient(90deg, var(--amber), #ffb733, var(--amber));
+        background-size: 200% auto;
+        color: var(--navy);
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 700;
+        font-family: 'Space Grotesk', sans-serif;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 8px 20px rgba(252,163,17,0.28);
+    }
+    button.submit:hover { background-position: 100% center; transform: translateY(-2px); box-shadow: 0 14px 28px rgba(252,163,17,0.4); }
+    button.submit:active { transform: translateY(0) scale(0.98); }
+
+    .switch-link {
+        text-align: center;
+        margin-top: 22px;
+        font-size: 13px;
+        color: var(--text-dim);
+    }
+    .switch-link a { color: var(--navy); font-weight: 700; text-decoration: none; }
+    .switch-link a:hover { color: var(--amber); }
+
+    @media (max-width: 720px) {
+        .wrap { flex-direction: column; }
+        .panel { padding: 34px 30px; }
+        .panel h1 { font-size: 25px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <div class="panel">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="glow"></div>
+
+        <div>
+            <div class="brand"><span class="brand-dot"></span>LABTRACK</div>
+            <h1>Welcome back.<br>Let's <span>get to work.</span></h1>
+            <p class="sub">Log in to monitor and grade lab performance live.</p>
+
+            <div class="mock-window">
+                <div class="mock-titlebar">
+                    <div class="mock-dot r"></div><div class="mock-dot y"></div><div class="mock-dot g"></div>
+                </div>
+                <div class="mock-body" id="typeTarget"></div>
+            </div>
+
+            <div class="checklist">
+                <div class="item"><span class="tick">✓</span>Live code monitoring, no walking the lab</div>
+                <div class="item"><span class="tick">✓</span>Python, Java, C, C++ & SQL supported</div>
+                <div class="item"><span class="tick">✓</span>Class chat — no phone numbers needed</div>
+            </div>
+        </div>
+
+        <div class="panel-footer">&copy; 2026 LabTrack — Built for practical evaluation</div>
+    </div>
+
+    <div class="form-side">
+        <h2>Log in to your account</h2>
+        <p class="lead">Enter your details to continue.</p>
+
+        {% if error %}
+        <div class="error-msg">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="/login">
+            <div class="field">
+                <label>Email Address</label>
+                <div class="field-input-wrap">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><path d="M2 6h20v12H2z"/></svg>
+                    <input type="email" name="email" placeholder="you@college.edu" required>
+                </div>
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <div class="field-input-wrap">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input type="password" name="password" placeholder="Your password" required>
+                </div>
+            </div>
+
+            <button type="submit" class="submit">Log In</button>
+        </form>
+
+        <div class="switch-link">Don't have an account? <a href="/signup">Sign up</a></div>
+    </div>
+
+</div>
+
+<script>
+    const lines = [
+        'if n % 2 == 0:\n    print("Even")',
+        'SELECT * FROM students;',
+        'System.out.println("Hi!");'
+    ];
+    const target = document.getElementById('typeTarget');
+    let li = 0, ci = 0, deleting = false;
+
+    function highlight(text) {
+        return text
+            .replace(/\b(if|print|SELECT|FROM|System|out|println)\b/g, '<span class="kw">$1</span>')
+            .replace(/"([^"]*)"/g, '<span class="str">"$1"</span>');
+    }
+
+    function tick() {
+        const full = lines[li];
+        if (!deleting) {
+            ci++;
+            target.innerHTML = highlight(full.slice(0, ci)) + '<span class="typed-cursor"></span>';
+            if (ci === full.length) { deleting = true; setTimeout(tick, 1400); return; }
+        } else {
+            ci--;
+            target.innerHTML = highlight(full.slice(0, ci)) + '<span class="typed-cursor"></span>';
+            if (ci === 0) { deleting = false; li = (li + 1) % lines.length; }
+        }
+        setTimeout(tick, deleting ? 25 : 45);
+    }
+    tick();
+</script>
+
+</body>
+</html>

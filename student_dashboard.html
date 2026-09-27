@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Dashboard - LabTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+<style>
+    :root{
+        --navy: #14213D;
+        --navy-2: #1C2E52;
+        --amber: #FCA311;
+        --amber-dim: #FCA31133;
+        --bg: #F5F6F8;
+        --text-dim: #8A93A8;
+        --white: #ffffff;
+        --green: #1DAA6D;
+        --red: #E5484D;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+    }
+    .topbar {
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        color: white;
+        padding: 18px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: 0.3px;
+    }
+    .brand-dot {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        background: var(--amber);
+        box-shadow: 0 0 0 4px var(--amber-dim);
+    }
+    .topbar .user-info {
+        font-size: 13px;
+        color: #C9D0E0;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .avatar {
+        width: 28px; height: 28px;
+        border-radius: 50%;
+        background: var(--amber);
+        color: var(--navy);
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .my-scores-link {
+        color: var(--amber);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 12px;
+    }
+    .topbar .logout {
+        color: var(--amber);
+        text-decoration: none;
+        font-weight: 600;
+        border: 1px solid var(--amber);
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+    .topbar .logout:hover { background: var(--amber); color: var(--navy); }
+
+    .hero {
+        background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+        color: white;
+        padding: 0 32px 56px;
+        position: relative;
+        overflow: hidden;
+    }
+    .hero::before {
+        content: "";
+        position: absolute;
+        top: -80px; right: -80px;
+        width: 260px; height: 260px;
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 50%;
+    }
+    .hero-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding-top: 30px;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .hero-inner h1 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; margin: 0 0 6px; }
+    .hero-inner p { color: #AEB7CC; font-size: 14px; margin: 0; }
+    .hero-date {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--amber);
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        padding: 8px 14px;
+        border-radius: 8px;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: -34px auto 0;
+        padding: 0 24px 40px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 24px rgba(20,33,61,0.10);
+        border-top: 3px solid var(--amber);
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+    .stat-card .label {
+        font-size: 11px; color: var(--text-dim); font-weight: 600;
+        letter-spacing: 0.4px; text-transform: uppercase;
+    }
+    .stat-card .value {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 26px; color: var(--navy); margin-top: 6px;
+    }
+    .stat-card .value.green { color: var(--green); }
+    .stat-icon {
+        width: 34px; height: 34px;
+        border-radius: 9px;
+        background: var(--amber-dim);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .panel-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 24px rgba(20,33,61,0.08);
+        padding: 26px;
+    }
+    .panel-card h2 { font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: var(--navy); margin: 0 0 4px; }
+    .panel-card .panel-sub { color: var(--text-dim); font-size: 13px; margin: 0 0 20px; }
+
+    .lab-block {
+        padding: 18px 6px;
+        border-bottom: 1px solid #F0F1F5;
+    }
+    .lab-block:last-child { border-bottom: none; }
+
+    .lab-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+    .lab-left { display: flex; align-items: center; gap: 14px; }
+    .lab-icon {
+        width: 38px; height: 38px;
+        border-radius: 10px;
+        background: var(--amber-dim);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .lab-info b { color: var(--navy); font-size: 14.5px; }
+    .lab-info .desc { color: var(--text-dim); font-size: 12.5px; margin-top: 3px; max-width: 460px; }
+
+    .status-pill {
+        font-size: 11.5px;
+        font-weight: 700;
+        padding: 6px 13px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+    }
+    .status-pill.pending { background: #FFF4E0; color: #B97300; }
+    .status-pill.graded { background: #E7F7EF; color: var(--green); }
+
+    .code-form {
+        margin-left: 52px;
+    }
+    .code-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+    .lang-select {
+        padding: 5px 10px;
+        border-radius: 6px;
+        border: 1.5px solid #E3E6ED;
+        font-size: 12.5px;
+        font-family: 'Inter', sans-serif;
+        color: var(--navy);
+    }
+    .CodeMirror {
+        height: 220px;
+        border: 1.5px solid #E3E6ED;
+        border-radius: 8px;
+        font-size: 13px;
+    }
+    .run-btn {
+        background: var(--navy);
+        color: white;
+        border: none;
+        padding: 9px 16px;
+        border-radius: 7px;
+        font-weight: 700;
+        font-size: 12.5px;
+        cursor: pointer;
+    }
+    .run-btn:hover { background: var(--navy-2); }
+    .save-code-btn {
+        background: var(--amber);
+        color: var(--navy);
+        border: none;
+        padding: 9px 18px;
+        border-radius: 7px;
+        font-weight: 700;
+        font-size: 12.5px;
+        cursor: pointer;
+    }
+    .save-code-btn:hover { background: #e6940c; }
+    .output-box {
+        margin-top: 10px;
+        background: #0D1526;
+        color: #B6F09C;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12.5px;
+        padding: 12px 14px;
+        border-radius: 8px;
+        white-space: pre-wrap;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .upload-box {
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid #F0F1F5;
+    }
+    .upload-box input[type="file"] {
+        flex: 1;
+        font-size: 12.5px;
+    }
+
+    .progress-track {
+        background: #EEF0F4;
+        border-radius: 10px;
+        height: 10px;
+        overflow: hidden;
+    }
+    .progress-fill {
+        background: var(--green);
+        height: 100%;
+        width: 0%;
+    }
+    .progress-percent {
+        text-align: right;
+        margin-top: 6px;
+        font-size: 12.5px;
+        color: var(--text-dim);
+        font-weight: 700;
+    }
+
+    .empty-state { text-align: center; padding: 50px 20px; }
+    .empty-state svg { margin-bottom: 14px; opacity: 0.55; }
+    .empty-state .title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: var(--navy); font-size: 15px; margin-bottom: 4px; }
+    .empty-state .sub { color: var(--text-dim); font-size: 13px; max-width: 320px; margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand"><span class="brand-dot"></span>LABTRACK</div>
+    <div class="user-info">
+        <div class="avatar">{{ user.name[0] }}</div>
+        {{ user.name }} · Student
+        <a href="/class-chat" class="my-scores-link" id="chatTopbarLink" style="position:relative;">
+            Class Chat
+            {% if unread_count > 0 %}
+            <span id="chatBadge" style="position:absolute; top:-9px; right:-16px; min-width:16px; height:16px; padding:0 3px; background:var(--red); color:white; border-radius:9px; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px var(--navy);">{{ unread_count }}</span>
+            {% endif %}
+        </a>
+        <a href="/my-scores" class="my-scores-link">My Scores</a>
+        <a href="/logout" class="logout">Log out</a>
+    </div>
+</div>
+
+<div class="hero">
+    <div class="hero-inner">
+        <div>
+            <h1>Hi, {{ user.name.split(' ')[0] }} 👋</h1>
+            <p>
+                Here's a look at your lab progress so far.
+                {% if batch_name %}
+                <span style="color: var(--amber); font-weight:600;">· {{ batch_name }}</span>
+                {% else %}
+                <span style="color: #AEB7CC;">· No batch assigned yet</span>
+                {% endif %}
+            </p>
+        </div>
+        <div class="hero-date" id="todayDate"></div>
+    </div>
+</div>
+
+<div class="container">
+    {% if new_invite_titles %}
+    <div style="background: var(--amber-dim); border: 1.5px solid var(--amber); border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; display:flex; align-items:center; gap:10px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B97300" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div style="font-size:13.5px; color:#8A5A00; font-weight:600;">
+            {% if new_invite_titles|length == 1 %}
+                Your teacher invited you to "{{ new_invite_titles[0] }}"!
+            {% else %}
+                Your teacher invited you to {{ new_invite_titles|length }} new labs: {{ new_invite_titles|join(', ') }}
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% set graded_count = submitted_lab_ids.values() | selectattr('status', 'equalto', 'graded') | list | length %}
+    {% set pending_count = submitted_lab_ids.values() | selectattr('status', 'equalto', 'pending') | list | length %}
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div>
+                <div class="label">Labs Completed</div>
+                <div class="value">{{ graded_count }}</div>
+            </div>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div>
+                <div class="label">Awaiting Grade</div>
+                <div class="value">{{ pending_count }}</div>
+            </div>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div>
+                <div class="label">Total Labs Available</div>
+                <div class="value green">{{ labs|length }}</div>
+            </div>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2"><path d="M9 3h6l1 4h3a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a1 1 0 0 1 1-1h3l1-4z"/><circle cx="12" cy="13" r="3"/></svg>
+            </div>
+        </div>
+    </div>
+
+    {% set total = labs|length %}
+    {% set done = submitted_lab_ids.values() | selectattr('status', 'equalto', 'graded') | list | length %}
+    {% set percent = ((done / total * 100) if total > 0 else 0) | round %}
+
+    <div class="panel-card" style="margin-bottom:20px;">
+        <h2>Overall Practical Progress</h2>
+        <p class="panel-sub">{{ done }} of {{ total }} practicals completed and graded.</p>
+        <div class="progress-track">
+            <div class="progress-fill" data-percent="{{ percent }}"></div>
+        </div>
+        <div class="progress-percent">{{ percent }}% complete</div>
+    </div>
+
+    <div class="panel-card">
+        <h2>Your Labs</h2>
+        <p class="panel-sub">Write your code below, pick a language, and click Run to test it. Your code auto-saves as you type — no need to click Save unless you want to.</p>
+        <form method="POST" action="/join-lab" style="display:flex; gap:8px; margin-bottom:20px;">
+            <input type="text" name="class_code" placeholder="Enter class code (e.g. 4P5ZDV)" style="flex:1; padding:10px 14px; border:1.5px solid #E3E6ED; border-radius:8px; text-transform:uppercase;">
+            <button type="submit" class="save-code-btn">Join Lab</button>
+        </form>
+
+        {% if labs %}
+            {% for lab in labs %}
+            {% set sub = submitted_lab_ids.get(lab.id) %}
+            <div class="lab-block">
+                <div class="lab-row">
+                    <div class="lab-left">
+                        <div class="lab-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2"><path d="M9 3h6l1 4h3a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a1 1 0 0 1 1-1h3l1-4z"/><circle cx="12" cy="13" r="3"/></svg>
+                        </div>
+                        <div class="lab-info">
+                            <b>{{ lab.title }}</b>
+                            <div class="desc">{{ lab.description }}</div>
+                        </div>
+                    </div>
+
+                    {% if sub and sub.status == 'graded' %}
+                        <span class="status-pill graded">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                            Graded
+                        </span>
+                    {% else %}
+                        <span class="status-pill pending">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+                            {{ 'In progress' if sub else 'Not started' }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                {% if lab.lab_type == 'programming' or not lab.lab_type %}
+                <div class="code-form">
+
+                    {% if sub and sub.submitted_at %}
+                    <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">
+                        Last saved: {{ sub.submitted_at | ist }}
+                    </div>
+                    {% endif %}
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <div class="code-label">Your Code</div>
+                        <select class="lang-select" data-lab="{{ lab.id }}">
+                            <option value="python" {% if sub and sub.language=='python' %}selected{% endif %}>Python</option>
+                            <option value="java" {% if sub and sub.language=='java' %}selected{% endif %}>Java</option>
+                            <option value="c" {% if sub and sub.language=='c' %}selected{% endif %}>C</option>
+                            <option value="cpp" {% if sub and sub.language=='cpp' %}selected{% endif %}>C++</option>
+                            <option value="sql" {% if sub and sub.language=='sql' %}selected{% endif %}>SQL</option>
+                        </select>
+                    </div>
+
+                    <div class="editor-holder" id="editor-{{ lab.id }}"></div>
+                    <textarea id="raw-{{ lab.id }}" style="display:none;">{{ sub.code_content if sub and sub.code_content else '' }}</textarea>
+                    <input type="hidden" id="expected-{{ lab.id }}" value="{{ lab.expected_output or '' }}">
+                    <input type="hidden" id="correct-{{ lab.id }}" value="0">
+
+                    <div style="display:flex; gap:8px; margin-top:8px;">
+                        <button type="button" class="run-btn" data-lab="{{ lab.id }}">▶ Run</button>
+                        <form method="POST" action="/save-code/{{ lab.id }}" id="form-{{ lab.id }}" style="margin:0;">
+                            <input type="hidden" name="code_content" id="hidden-code-{{ lab.id }}">
+                            <input type="hidden" name="language" id="hidden-lang-{{ lab.id }}">
+                            <input type="hidden" name="is_correct" id="hidden-correct-{{ lab.id }}">
+                            <input type="hidden" name="output_text" id="hidden-output-{{ lab.id }}">
+                            <button type="button" class="save-code-btn" data-lab="{{ lab.id }}">Save Code</button>
+                        </form>
+                    </div>
+
+                    <pre class="output-box" id="output-{{ lab.id }}">{{ sub.output if sub and sub.output else 'Output will appear here after you click Run.' }}</pre>
+
+                    <div class="upload-box">
+                        <div class="code-label" style="margin-bottom:8px;">Attach Final Report (optional)</div>
+                        <form method="POST" action="/upload-file/{{ lab.id }}" enctype="multipart/form-data" style="display:flex; gap:8px; align-items:center;">
+                            <input type="file" name="report_file">
+                            <button type="submit" class="save-code-btn">Upload</button>
+                        </form>
+                        {% if sub and sub.file_path %}
+                            <div style="margin-top:8px; font-size:12px; color:#1DAA6D;">✓ File uploaded: {{ sub.file_path.split('_', 2)[-1] }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% else %}
+                <div class="code-form">
+
+                    {% if sub and sub.submitted_at %}
+                    <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">
+                        Last saved: {{ sub.submitted_at | ist }}
+                    </div>
+                    {% endif %}
+
+                    <div class="code-label" style="margin-bottom:8px;">
+                        {{ 'Data Science' if lab.lab_type == 'datascience' else 'DBMS' if lab.lab_type == 'dbms' else 'Networking' }} Answer
+                    </div>
+
+                    <form method="POST" action="/save-code/{{ lab.id }}">
+                        <textarea
+                            name="code_content"
+                            class="no-copy-paste"
+                            rows="8"
+                            style="width:100%; padding:12px; border:1.5px solid #E3E6ED; border-radius:8px; font-family:'JetBrains Mono', monospace; font-size:13px; resize:vertical;"
+                            placeholder="Write your answer, query, or analysis here..."
+                        >{{ sub.code_content if sub and sub.code_content else '' }}</textarea>
+
+                        <input type="hidden" name="language" value="{{ lab.lab_type }}">
+
+                        <button type="submit" class="save-code-btn" style="margin-top:8px;">
+                            Save Answer
+                        </button>
+                    </form>
+
+                    <div class="upload-box">
+                        <div class="code-label" style="margin-bottom:8px;">Attach Final Report (optional)</div>
+                        <form method="POST" action="/upload-file/{{ lab.id }}" enctype="multipart/form-data" style="display:flex; gap:8px; align-items:center;">
+                            <input type="file" name="report_file">
+                            <button type="submit" class="save-code-btn">Upload</button>
+                        </form>
+                        {% if sub and sub.file_path %}
+                            <div style="margin-top:8px; font-size:12px; color:#1DAA6D;">✓ File uploaded: {{ sub.file_path.split('_', 2)[-1] }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="1.5">
+                <path d="M9 3h6l1 4h3a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a1 1 0 0 1 1-1h3l1-4z"/>
+                <circle cx="12" cy="13" r="3.5"/>
+            </svg>
+            <div class="title">No labs yet</div>
+            <div class="sub">Once your teacher creates a lab, it'll show up here for you to complete.</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<audio id="notifSound" src="https://cdnjs.cloudflare.com/ajax/libs/ion-sound/3.0.7/sounds/bell_ring.mp3" preload="auto"></audio>
+
+<script>
+    document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    document.querySelectorAll('.progress-fill').forEach(function (bar) {
+        var percent = bar.getAttribute('data-percent');
+        bar.style.width = percent + '%';
+    });
+
+    const modeMap = { python: 'python', java: 'text/x-java', c: 'text/x-csrc', cpp: 'text/x-c++src', sql: 'text/x-sql' };
+    const pistonLang = { python: 'python', java: 'java', c: 'c', cpp: 'cpp' };
+    const editors = {};
+
+    document.querySelectorAll('.editor-holder').forEach(holder => {
+        const labId = holder.id.split('-')[1];
+        const rawBox = document.getElementById('raw-' + labId);
+        const langSelect = document.querySelector('.lang-select[data-lab="' + labId + '"]');
+        const cm = CodeMirror(holder, {
+            value: rawBox.value,
+            mode: modeMap[langSelect.value],
+            lineNumbers: true,
+            theme: 'default'
+        });
+        editors[labId] = cm;
+
+        cm.on('beforeChange', function(instance, change) {
+            if (change.origin === 'paste') {
+                change.cancel();
+            }
+        });
+        cm.getWrapperElement().addEventListener('copy', e => e.preventDefault());
+        cm.getWrapperElement().addEventListener('cut', e => e.preventDefault());
+        cm.getWrapperElement().addEventListener('contextmenu', e => e.preventDefault());
+
+        langSelect.addEventListener('change', () => {
+            cm.setOption('mode', modeMap[langSelect.value]);
+        });
+    });
+
+    document.querySelectorAll('.no-copy-paste').forEach(function(box) {
+        box.addEventListener('paste', function(e) { e.preventDefault(); });
+        box.addEventListener('copy', function(e) { e.preventDefault(); });
+        box.addEventListener('cut', function(e) { e.preventDefault(); });
+        box.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+    });
+
+    function checkCorrectness(labId, outputText) {
+        const expectedBox = document.getElementById('expected-' + labId);
+        const correctBox = document.getElementById('correct-' + labId);
+        const expected = expectedBox.value.trim();
+        if (expected && outputText.trim() === expected) {
+            correctBox.value = '1';
+        } else {
+            correctBox.value = '0';
+        }
+    }
+
+    function saveLab(labId) {
+        document.getElementById('hidden-code-' + labId).value = editors[labId].getValue();
+        document.getElementById('hidden-lang-' + labId).value = document.querySelector('.lang-select[data-lab="' + labId + '"]').value;
+        document.getElementById('hidden-correct-' + labId).value = document.getElementById('correct-' + labId).value;
+        document.getElementById('hidden-output-' + labId).value = document.getElementById('output-' + labId).textContent;
+        document.getElementById('form-' + labId).submit();
+    }
+
+    document.querySelectorAll('.save-code-btn[data-lab]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            saveLab(btn.getAttribute('data-lab'));
+        });
+    });
+
+    let SQLPromise = initSqlJs({ locateFile: file => 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/' + file });
+
+    document.querySelectorAll('.run-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const labId = btn.getAttribute('data-lab');
+            const lang = document.querySelector('.lang-select[data-lab="' + labId + '"]').value;
+            const code = editors[labId].getValue();
+            const outBox = document.getElementById('output-' + labId);
+            outBox.textContent = 'Running...';
+            document.getElementById('correct-' + labId).value = '0';
+
+            if (lang === 'sql') {
+                try {
+                    const SQL = await SQLPromise;
+                    const db = new SQL.Database();
+                    const results = db.exec(code);
+                    let text = '';
+                    if (results.length === 0) {
+                        text = 'Query ran successfully (no rows returned).';
+                    } else {
+                        results.forEach(r => {
+                            text += r.columns.join(' | ') + '\n';
+                            r.values.forEach(row => { text += row.join(' | ') + '\n'; });
+                        });
+                    }
+                    outBox.textContent = text;
+                    checkCorrectness(labId, text);
+                } catch (err) {
+                    outBox.textContent = 'Error: ' + err.message;
+                }
+                return;
+            }
+
+            try {
+                const res = await fetch('/run-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ language: lang, code: code })
+                });
+                const data = await res.json();
+                let out = data.output || '';
+                if (data.error) {
+                    out += (out ? '\nErrors:\n' : '') + data.error;
+                }
+                outBox.textContent = out || 'No output.';
+                checkCorrectness(labId, out);
+            } catch (err) {
+                outBox.textContent = 'Could not run code: ' + err.message;
+            }
+        });
+    });
+
+    setInterval(() => {
+    Object.keys(editors).forEach(labId => {
+        const code = editors[labId].getValue();
+        const lang = document.querySelector('.lang-select[data-lab="' + labId + '"]').value;
+
+        const outEl = document.getElementById('output-' + labId);
+        let output = '';
+        if (outEl) {
+            const text = outEl.textContent;
+            if (text && text !== 'Output will appear here after you click Run.' && text !== 'Running...') {
+                output = text;
+            }
+        }
+
+        fetch('/auto-save/' + labId, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code_content: code, language: lang, output_text: output })
+        }).catch(() => {});
+    });
+}, 5000);
+
+    let lastCount = parseInt("{{ unread_count }}", 10);
+
+    function playNotifSound() {
+        const sound = document.getElementById('notifSound');
+        sound.play().catch(() => {});
+    }
+
+    function updateBadge(id, count) {
+        let badge = document.getElementById(id);
+        if (count > 0) {
+            if (!badge) {
+                return;
+            }
+            badge.textContent = count;
+            badge.style.display = 'flex';
+        } else if (badge) {
+            badge.style.display = 'none';
+        }
+    }
+
+    setInterval(() => {
+        fetch('/check-new-messages')
+            .then(res => res.json())
+            .then(data => {
+                const count = data.unread_count;
+
+                if (count > lastCount) {
+                    playNotifSound();
+                }
+
+                updateBadge('chatBadge', count);
+
+                lastCount = count;
+            })
+            .catch(() => {});
+    }, 8000);
+</script>
+
+</body>
+</html>
